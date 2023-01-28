@@ -38,7 +38,16 @@ class User {
    * авторизованном пользователе.
    * */
   static fetch(callback) {
-    createRequest({url: URL+'/current', method: 'GET', callback});
+    createRequest({url: User.URL+'/current', method: 'GET', callback(err, response){
+        let obj = JSON.parse(response);
+
+        if ( obj && obj.user ) {
+          User.setCurrent( obj.user );
+        } else{
+            User.unsetCurrent();
+        }
+        callback(err, response);
+      }});
   }
 
   /**
@@ -48,18 +57,14 @@ class User {
    * User.setCurrent.
    * */
   static login(data, callback) {
-    createRequest({
-      url: this.URL + '/login',
-      method: 'POST',
-      responseType: 'json',
-      data,
-      callback: (err, response) => {
-        if (response && response.user) {
-          this.setCurrent(response.user);
+    createRequest({data: data, url: User.URL+'/login', method: 'POST', callback(err, response){
+        let obj = JSON.parse(response);
+        if ( obj && obj.user ) {
+          User.setCurrent( obj.user );
         }
         callback(err, response);
-      }
-    });
+      }});
+      location.reload();
   }
 
   /**
@@ -69,7 +74,14 @@ class User {
    * User.setCurrent.
    * */
   static register(data, callback) {
-
+    createRequest({data: data, url: User.URL+'/register', method: 'POST', callback(err, response){
+      let obj = JSON.parse(response);
+        if ( obj && obj.user ) {
+          User.setCurrent( obj.user );
+        }
+        callback(err, response);
+      }});
+    location.reload();
   }
 
   /**
@@ -77,6 +89,13 @@ class User {
    * выхода необходимо вызвать метод User.unsetCurrent
    * */
   static logout(callback) {
-
+    createRequest({url: User.URL+'/logout', method: 'POST', callback(err, response){
+        let obj = JSON.parse(response);
+        if ( obj && obj.user ) {
+          User.unsetCurrent();
+        }
+        callback(err, response);
+      }});
+      location.reload();
   }
 }
